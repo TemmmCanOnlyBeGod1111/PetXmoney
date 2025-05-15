@@ -1,217 +1,1132 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pet Exchange & Buy</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
-</head>
-<body class="bg-[#121212] text-white">
-
-  <div id="root"></div>
-
-  <!-- React and Babel CDNs -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <!-- React Component -->
-  <script type="text/babel">
-    const { useState, useRef } = React;
-
-    function MainComponent() {
-      const [currentPage, setCurrentPage] = useState('exchange');
-      const [selectedMethod, setSelectedMethod] = useState(null);
-      const [checkCooldown, setCheckCooldown] = useState(false);
-      const [showError, setShowError] = useState(false);
-      const [gemAmount, setGemAmount] = useState('');
-      const [selectedPet, setSelectedPet] = useState('');
-      const [quantity, setQuantity] = useState(1);
-      const [username, setUsername] = useState('');
-      const [copied, setCopied] = useState(false);
-      const contentRef = useRef(null);
-      const checkRef = useRef(null);
-
-      const petPrices = {
-        "Huge Sphinx": 0.65,
-        "God Potion": 0.1,
-        "Huge Egg": 2.0
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet Exchange Platform</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#6366f1", secondary: "#4f46e5" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
       };
-
-      const robloxUsername = "DawnCookieBlade";
-      const ltcAddress = "LeojFgdrydNCJVTU4ULH9ZguhzBRpzYcpY";
-
-      const calculateTotal = () => {
-        if (!selectedPet) return { usd: "0.00", ltc: "0.0000" };
-        const ltcAmount = petPrices[selectedPet] * quantity;
-        const usdAmount = ltcAmount * 0.47;
-        return {
-          usd: usdAmount.toFixed(2),
-          ltc: ltcAmount.toFixed(4)
-        };
-      };
-
-      const calculateValue = (gems) => {
-        const gemValue = parseInt(gems) || 0;
-        const baseValue = gemValue / 1000000;
-        return {
-          robux: (baseValue * 230).toFixed(2),
-          btc: (baseValue * 0.5).toFixed(2),
-          ltc: (baseValue * 0.47).toFixed(2),
-          eth: (baseValue * 0.49).toFixed(2),
-          paypal: (baseValue * 0.49).toFixed(2)
-        };
-      };
-
-      const values = calculateValue(gemAmount);
-      const total = calculateTotal();
-
-      const copyUsername = () => {
-        navigator.clipboard.writeText(robloxUsername);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      };
-
-      const handleCheck = (type) => {
-        if (type === 'buy') {
-          if (selectedPet && username && quantity > 0) {
-            alert('Payment details will be shown here');
-          }
-        } else if (!checkCooldown) {
-          setCheckCooldown(true);
-          setTimeout(() => {
-            setShowError(true);
-            if (checkRef.current) {
-              checkRef.current.scrollIntoView({ behavior: "smooth" });
-            }
-          }, Math.random() * 3000 + 2000);
-
-          setTimeout(() => {
-            setCheckCooldown(false);
-          }, 15000);
-        }
-      };
-
-      return (
-        <div className="min-h-screen font-poppins px-4 py-10 max-w-5xl mx-auto">
-          <div className="flex flex-col sm:flex-row gap-4 justify-end mb-8">
-            <button onClick={() => setCurrentPage('exchange')} className={`px-6 py-3 rounded-lg ${currentPage === 'exchange' ? 'bg-blue-600' : 'bg-green-600'} text-white`}>
-              Exchange Pets
-            </button>
-            <button onClick={() => setCurrentPage('buy')} className={`px-6 py-3 rounded-lg ${currentPage === 'buy' ? 'bg-blue-600' : 'bg-green-600'} text-white`}>
-              Buy Pets
-            </button>
-          </div>
-
-          {currentPage === 'buy' ? (
-            <div>
-              <h1 className="text-4xl md:text-6xl text-white mb-6 text-center">Buy Pets</h1>
-              <p className="text-gray-300 text-center mb-12">Purchase exclusive pets using Litecoin (LTC)</p>
-
-              <div className="bg-[#1e1e1e] p-6 rounded-lg">
-                <div className="mb-6">
-                  <label className="block text-white mb-2">Select Pet:</label>
-                  <select value={selectedPet} onChange={(e) => setSelectedPet(e.target.value)} className="w-full bg-[#2a2a2a] text-white p-3 rounded">
-                    <option value="">Choose a pet</option>
-                    <option value="Huge Sphinx">Huge Sphinx</option>
-                    <option value="God Potion">God Potion</option>
-                    <option value="Huge Egg">Huge Egg</option>
-                  </select>
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-white mb-2">Quantity:</label>
-                  <input type="number" min="1" value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value) || 1)} className="w-full bg-[#2a2a2a] text-white p-3 rounded" />
-                </div>
-
-                <div className="mb-6">
-                  <label className="block text-white mb-2">Roblox Username:</label>
-                  <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full bg-[#2a2a2a] text-white p-3 rounded" />
-                </div>
-
-                <div className="bg-[#2a2a2a] p-4 rounded mb-6">
-                  <p className="text-xl text-white mb-2">Total Price: ${total.usd} (≈ {total.ltc} LTC)</p>
-                  <p className="text-gray-300 text-sm break-all">Send LTC to: {ltcAddress}</p>
-                </div>
-
-                <button onClick={() => handleCheck('buy')} className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-all duration-300">
-                  Check
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+    />
+    <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+      body {
+      font-family: 'Inter', sans-serif;
+      scroll-behavior: smooth;
+      background-color: #0f0f0f;
+      color: #fff;
+      }
+      .btn {
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      transform-origin: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      will-change: transform;
+      }
+      .btn:hover {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+      }
+      .btn:active {
+      transform: translateY(4px);
+      }
+      .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      }
+      .dot-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: 20px 20px;
+      background-image: radial-gradient(circle, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+      z-index: -1;
+      transition: background-position 0.3s ease;
+      }
+      .btn {
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      transform-origin: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      will-change: transform;
+      }
+      .btn:hover {
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.3);
+      }
+      .btn:active {
+      transform: translateY(4px);
+      }
+      .btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.3);
+      opacity: 0;
+      border-radius: 100%;
+      transform: scale(1, 1) translate(-50%);
+      transform-origin: 50% 50%;
+      }
+      .btn:focus:not(:active)::after {
+      animation: ripple 1s ease-out;
+      }
+      .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      }
+      .fade-in.active {
+      opacity: 1;
+      transform: translateY(0);
+      }
+      .section {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      }
+      .copy-field {
+      position: relative;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      width: 100%;
+      color: #fff;
+      font-family: monospace;
+      }
+      .copy-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      }
+      .copy-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      }
+      .loading-circle {
+      width: 80px;
+      height: 80px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: #6366f1;
+      animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+      to {
+      transform: rotate(360deg);
+      }
+      }
+      @keyframes ripple {
+      0% {
+      transform: scale(0, 0);
+      opacity: 1;
+      }
+      20% {
+      transform: scale(25, 25);
+      opacity: 1;
+      }
+      100% {
+      opacity: 0;
+      transform: scale(40, 40);
+      }
+      }
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+      }
+      input[type="number"] {
+      -moz-appearance: textfield;
+      }
+      .custom-select {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      }
+      .custom-select-selected {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      }
+      .custom-select-options {
+      display: none;
+      position: absolute;
+      background-color: #1a1a1a;
+      min-width: 100%;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+      z-index: 1;
+      border-radius: 8px;
+      margin-top: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      }
+      .custom-select-options div {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      }
+      .custom-select-options div:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      }
+      .custom-select.active .custom-select-options {
+      display: block;
+      }
+      .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      }
+      .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      }
+      .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.1);
+      transition: .4s;
+      border-radius: 34px;
+      }
+      .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      }
+      input:checked + .toggle-slider {
+      background-color: #6366f1;
+      }
+      input:checked + .toggle-slider:before {
+      transform: translateX(26px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dot-background" id="dotBackground"></div>
+    <header
+      class="fixed top-0 left-0 w-full bg-black bg-opacity-70 backdrop-blur-md z-50 py-4 px-6"
+    >
+      <div class="flex justify-between items-center max-w-7xl mx-auto">
+        <div></div>
+        <div class="flex gap-4">
+          <button
+            id="returnMainBtn"
+            class="btn !rounded-button bg-gradient-to-r from-secondary to-secondary/80 text-white px-6 py-3 font-medium whitespace-nowrap"
+          >
+            Return to Exchange
+          </button>
+          <button
+            id="buyPetsBtn"
+            class="btn !rounded-button bg-gradient-to-r from-primary to-primary/80 text-white px-6 py-3 font-medium whitespace-nowrap"
+          >
+            Buy Pets Instead
+          </button>
+        </div>
+      </div>
+    </header>
+    <main>
+      <!-- Main Section -->
+      <section id="mainSection" class="section pt-24">
+        <div class="max-w-4xl w-full mx-auto text-center">
+          <h1 class="text-5xl font-bold mb-6 fade-in">
+            Exchange Your Roblox Pets for Crypto/PayPal/Robux
+          </h1>
+          <p class="text-xl text-gray-300 mb-12 max-w-2xl mx-auto fade-in">
+            Send your valuable Roblox Pets Go pets to our account and receive
+            cryptocurrency, PayPal funds, or Robux in return.
+          </p>
+          <div class="grid grid-cols-1 gap-6 fade-in">
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800"
+            >
+              <h2 class="text-2xl font-semibold mb-6">Select Payment Method</h2>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button
+                  id="cryptoBtn"
+                  class="btn !rounded-button bg-black text-white px-6 py-4 font-medium border border-gray-700 whitespace-nowrap"
+                >
+                  <div class="flex items-center justify-center gap-2">
+                    <div class="w-6 h-6 flex items-center justify-center">
+                      <i class="ri-bit-coin-line ri-lg"></i>
+                    </div>
+                    <span>Crypto</span>
+                  </div>
+                </button>
+                <button
+                  id="paypalBtn"
+                  class="btn !rounded-button bg-black text-white px-6 py-4 font-medium border border-gray-700 whitespace-nowrap"
+                >
+                  <div class="flex items-center justify-center gap-2">
+                    <div class="w-6 h-6 flex items-center justify-center">
+                      <i class="ri-paypal-line ri-lg"></i>
+                    </div>
+                    <span>PayPal</span>
+                  </div>
+                </button>
+                <button
+                  id="robuxBtn"
+                  class="btn !rounded-button bg-black text-white px-6 py-4 font-medium border border-gray-700 whitespace-nowrap"
+                >
+                  <div class="flex items-center justify-center gap-2">
+                    <div class="w-6 h-6 flex items-center justify-center">
+                      <i class="ri-gamepad-line ri-lg"></i>
+                    </div>
+                    <span>Robux</span>
+                  </div>
                 </button>
               </div>
             </div>
-          ) : (
-            <div>
-              <h1 className="text-4xl md:text-6xl text-white mb-6 text-center">Pet Exchange</h1>
-              <p className="text-gray-300 text-center mb-12">Send your pets to receive Crypto/PayPal/Robux in return</p>
-
-              <div className="bg-[#1e1e1e] p-6 rounded-lg mb-12">
-                <h2 className="text-2xl text-white mb-4">GEM RAP Calculator</h2>
-                <input type="number" value={gemAmount} onChange={(e) => setGemAmount(e.target.value)} placeholder="Enter gem amount" className="w-full bg-[#2a2a2a] text-white p-3 rounded mb-4" />
-                <div className="text-gray-300">
-                  <p>Conversion Rates (per 1M gems):</p>
-                  <p>• {values.robux} Robux</p>
-                  <p>• ${values.btc} in BTC</p>
-                  <p>• ${values.ltc} in LTC</p>
-                  <p>• ${values.eth} in ETH Classic</p>
-                  <p>• ${values.paypal} PayPal</p>
+          </div>
+        </div>
+      </section>
+      <!-- Crypto Section -->
+      <section id="cryptoSection" class="section hidden">
+        <div class="max-w-4xl w-full mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center fade-in">
+            Exchange for Cryptocurrency
+          </h2>
+          <div class="grid grid-cols-1 gap-8 fade-in">
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800"
+            >
+              <h3 class="text-xl font-semibold mb-4">
+                Send Pets to This Account
+              </h3>
+              <div class="relative mb-6">
+                <div class="copy-field" id="cryptoUsername">
+                  DawnCookieBlade
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                <button onClick={() => setSelectedMethod('crypto')} className="bg-[#1e1e1e] text-white p-6 rounded-lg hover:scale-105 transition-transform">
-                  <i className="fab fa-bitcoin text-2xl mb-2"></i>
-                  <div className="text-xl">Crypto</div>
-                </button>
-
-                <button onClick={() => setSelectedMethod('paypal')} className="bg-[#1e1e1e] text-white p-6 rounded-lg hover:scale-105 transition-transform">
-                  <i className="fab fa-paypal text-2xl mb-2"></i>
-                  <div className="text-xl">PayPal</div>
-                </button>
-
-                <button onClick={() => setSelectedMethod('robux')} className="bg-[#1e1e1e] text-white p-6 rounded-lg hover:scale-105 transition-transform">
-                  <i className="fas fa-coins text-2xl mb-2"></i>
-                  <div className="text-xl">Robux</div>
+                <button class="copy-btn" data-copy="DawnCookieBlade">
+                  <div class="w-5 h-5 flex items-center justify-center">
+                    <i class="ri-clipboard-line"></i>
+                  </div>
                 </button>
               </div>
-
-              {selectedMethod && (
-                <div ref={contentRef} className="bg-[#1e1e1e] p-6 rounded-lg">
-                  <h2 className="text-2xl text-white mb-4">Trade Details</h2>
-                  <div className="mb-6">
-                    <p className="text-gray-300 mb-2">Roblox Username (Send pets to):</p>
-                    <div className="flex items-center gap-4">
-                      <p className="text-gray-300">{robloxUsername}</p>
-                      <button onClick={copyUsername} className="bg-[#2a2a2a] text-white px-4 py-2 rounded hover:bg-[#333]">
-                        {copied ? <i className="fas fa-check"></i> : <i className="fas fa-copy"></i>}
-                      </button>
+              <p class="text-gray-400 mb-6">
+                Send your pets in-game to this account to receive cryptocurrency
+                in return.
+              </p>
+            </div>
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800 fade-in"
+            >
+              <h3 class="text-xl font-semibold mb-4">GEM RAP Calculator</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label class="block text-gray-300 mb-2"
+                    >Enter Gems Amount</label
+                  >
+                  <input
+                    type="number"
+                    id="gemsInput"
+                    class="w-full bg-gray-900 border-none rounded-lg px-4 py-3 text-white"
+                    placeholder="1,000,000"
+                  />
+                </div>
+                <div>
+                  <label class="block text-gray-300 mb-2"
+                    >Select Cryptocurrency</label
+                  >
+                  <div class="custom-select">
+                    <div class="custom-select-selected">
+                      <span>BTC</span>
+                      <div class="w-5 h-5 flex items-center justify-center">
+                        <i class="ri-arrow-down-s-line"></i>
+                      </div>
+                    </div>
+                    <div class="custom-select-options">
+                      <div data-value="BTC" data-rate="0.50">BTC</div>
+                      <div data-value="LTC" data-rate="0.47">LTC</div>
+                      <div data-value="ETH" data-rate="0.49">ETH Classic</div>
                     </div>
                   </div>
-
-                  {selectedMethod === 'crypto' && (
-                    <ul className="text-gray-300 list-disc list-inside">
-                      <li>Bitcoin (BTC)</li>
-                      <li>Litecoin (LTC)</li>
-                      <li>Ethereum Classic (ETC)</li>
-                    </ul>
-                  )}
-                  {selectedMethod === 'paypal' && (
-                    <p className="text-gray-300">PayPal payment will be processed after pet transfer confirmation</p>
-                  )}
-                  {selectedMethod === 'robux' && (
-                    <p className="text-gray-300">Robux will be transferred through group funds after confirmation</p>
-                  )}
                 </div>
-              )}
+              </div>
+              <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-300">Conversion Rate:</span>
+                  <span class="font-semibold"
+                    >1,000,000 gems = $<span id="conversionRate"
+                      >0.50</span
+                    ></span
+                  >
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-gray-300">Estimated Value:</span>
+                  <span class="font-semibold"
+                    >$<span id="estimatedValue">0.00</span>
+                    <span id="selectedCrypto">BTC</span></span
+                  >
+                </div>
+              </div>
             </div>
-          )}
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800 fade-in"
+            >
+              <h3 class="text-xl font-semibold mb-4">Your Crypto Address</h3>
+              <div class="mb-6">
+                <label class="block text-gray-300 mb-2"
+                  >Enter your wallet address</label
+                >
+                <input
+                  type="text"
+                  id="cryptoAddress"
+                  class="w-full bg-gray-900 border-none rounded-lg px-4 py-3 text-white"
+                  placeholder="Your BTC/LTC/ETH address"
+                />
+              </div>
+              <button
+                id="cryptoProceedBtn"
+                class="btn !rounded-button bg-gradient-to-r from-primary to-primary/80 text-white px-8 py-4 font-medium w-full whitespace-nowrap"
+              >
+                Proceed To Payment
+              </button>
+            </div>
+          </div>
         </div>
-      );
-    }
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<MainComponent />);
-  </script>
-</body>
+      </section>
+      <!-- PayPal Section -->
+      <section id="paypalSection" class="section hidden">
+        <div class="max-w-4xl w-full mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center fade-in">
+            Exchange for PayPal
+          </h2>
+          <div class="grid grid-cols-1 gap-8 fade-in">
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800"
+            >
+              <h3 class="text-xl font-semibold mb-4">
+                Send Pets to This Account
+              </h3>
+              <div class="relative mb-6">
+                <div class="copy-field" id="paypalUsername">
+                  DawnCookieBlade
+                </div>
+                <button class="copy-btn" data-copy="DawnCookieBlade">
+                  <div class="w-5 h-5 flex items-center justify-center">
+                    <i class="ri-clipboard-line"></i>
+                  </div>
+                </button>
+              </div>
+              <p class="text-gray-400 mb-6">
+                Send your pets in-game to this account to receive PayPal funds
+                in return.
+              </p>
+            </div>
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800 fade-in"
+            >
+              <h3 class="text-xl font-semibold mb-4">GEM RAP Calculator</h3>
+              <div class="mb-6">
+                <label class="block text-gray-300 mb-2"
+                  >Enter Gems Amount</label
+                >
+                <input
+                  type="number"
+                  id="paypalGemsInput"
+                  class="w-full bg-gray-900 border-none rounded-lg px-4 py-3 text-white"
+                  placeholder="1,000,000"
+                />
+              </div>
+              <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-300">Conversion Rate:</span>
+                  <span class="font-semibold"
+                    >1,000,000 gems = $0.49 PayPal</span
+                  >
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-gray-300">Estimated Value:</span>
+                  <span class="font-semibold"
+                    >$<span id="paypalEstimatedValue">0.00</span> PayPal</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800 fade-in"
+            >
+              <h3 class="text-xl font-semibold mb-4">Your PayPal Email</h3>
+              <div class="mb-6">
+                <label class="block text-gray-300 mb-2"
+                  >Enter your PayPal email</label
+                >
+                <input
+                  type="email"
+                  id="paypalEmail"
+                  class="w-full bg-gray-900 border-none rounded-lg px-4 py-3 text-white"
+                  placeholder="your.email@example.com"
+                />
+              </div>
+              <button
+                id="paypalProceedBtn"
+                class="btn !rounded-button bg-gradient-to-r from-primary to-primary/80 text-white px-8 py-4 font-medium w-full whitespace-nowrap"
+              >
+                Proceed To Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Robux Section -->
+      <section id="robuxSection" class="section hidden">
+        <div class="max-w-4xl w-full mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center fade-in">
+            Exchange for Robux
+          </h2>
+          <div class="grid grid-cols-1 gap-8 fade-in">
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800"
+            >
+              <h3 class="text-xl font-semibold mb-4">
+                Send Pets to This Account
+              </h3>
+              <div class="relative mb-6">
+                <div class="copy-field" id="robuxUsername">DawnCookieBlade</div>
+                <button class="copy-btn" data-copy="DawnCookieBlade">
+                  <div class="w-5 h-5 flex items-center justify-center">
+                    <i class="ri-clipboard-line"></i>
+                  </div>
+                </button>
+              </div>
+              <p class="text-gray-400 mb-6">
+                Send your pets in-game to this account to receive Robux in
+                return.
+              </p>
+            </div>
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800 fade-in"
+            >
+              <h3 class="text-xl font-semibold mb-4">GEM RAP Calculator</h3>
+              <div class="mb-6">
+                <label class="block text-gray-300 mb-2"
+                  >Enter Gems Amount</label
+                >
+                <input
+                  type="number"
+                  id="robuxGemsInput"
+                  class="w-full bg-gray-900 border-none rounded-lg px-4 py-3 text-white"
+                  placeholder="1,000,000"
+                />
+              </div>
+              <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-300">Conversion Rate:</span>
+                  <span class="font-semibold">1,000,000 gems = 230 Robux</span>
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-gray-300">Estimated Value:</span>
+                  <span class="font-semibold"
+                    ><span id="robuxEstimatedValue">0</span> Robux</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800 fade-in"
+            >
+              <h3 class="text-xl font-semibold mb-4">Your Roblox Username</h3>
+              <div class="mb-6">
+                <label class="block text-gray-300 mb-2"
+                  >Enter your Roblox username</label
+                >
+                <input
+                  type="text"
+                  id="robuxUsername"
+                  class="w-full bg-gray-900 border-none rounded-lg px-4 py-3 text-white"
+                  placeholder="Your Roblox username"
+                />
+              </div>
+              <button
+                id="robuxProceedBtn"
+                class="btn !rounded-button bg-gradient-to-r from-primary to-primary/80 text-white px-8 py-4 font-medium w-full whitespace-nowrap"
+              >
+                Proceed To Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Waiting Section -->
+      <section id="waitingSection" class="section hidden">
+        <div class="max-w-4xl w-full mx-auto text-center">
+          <h2 class="text-3xl font-bold mb-8 fade-in">Waiting For Pets</h2>
+          <div class="grid grid-cols-1 gap-8 fade-in">
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-12 rounded-xl border border-gray-800 flex flex-col items-center"
+            >
+              <div class="loading-circle mb-8"></div>
+              <p class="text-xl mb-8">
+                Please send your pets to
+                <span class="font-semibold">DawnCookieBlade</span> in game
+              </p>
+              <button
+                id="checkPetsBtn"
+                class="btn !rounded-button bg-gradient-to-r from-primary to-primary/80 text-white px-8 py-4 font-medium whitespace-nowrap mb-6"
+              >
+                Check (15s)
+              </button>
+              <p
+                id="noPetsMessage"
+                class="text-red-500 text-lg font-medium hidden"
+              >
+                No Pets were sent
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Payment Info Section -->
+      <section id="paymentInfoSection" class="section hidden">
+        <div class="max-w-4xl w-full mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center fade-in">
+            Payment Information
+          </h2>
+          <div
+            id="cryptoPaymentInfo"
+            class="grid grid-cols-1 gap-8 fade-in hidden"
+          >
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800"
+            >
+              <h3 class="text-xl font-semibold mb-4">Your Crypto Payment</h3>
+              <p class="text-gray-300 mb-6">
+                We'll send
+                <span id="cryptoAmount" class="font-semibold">0.00</span>
+                <span id="cryptoType" class="font-semibold">BTC</span> to the
+                following address:
+              </p>
+              <div class="bg-gray-900 p-4 rounded-lg mb-6 break-all">
+                <span id="cryptoAddressDisplay" class="font-mono">...</span>
+              </div>
+            </div>
+          </div>
+          <div
+            id="paypalPaymentInfo"
+            class="grid grid-cols-1 gap-8 fade-in hidden"
+          >
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800"
+            >
+              <h3 class="text-xl font-semibold mb-4">Your PayPal Payment</h3>
+              <p class="text-gray-300 mb-6">
+                We'll send $<span id="paypalAmount" class="font-semibold"
+                  >0.00</span
+                >
+                to the following email:
+              </p>
+              <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                <span id="paypalEmailDisplay" class="font-mono">...</span>
+              </div>
+            </div>
+          </div>
+          <div
+            id="robuxPaymentInfo"
+            class="grid grid-cols-1 gap-8 fade-in hidden"
+          >
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800"
+            >
+              <h3 class="text-xl font-semibold mb-4">Your Robux Payment</h3>
+              <p class="text-gray-300 mb-6">
+                We'll send
+                <span id="robuxAmount" class="font-semibold">0</span> Robux to
+                the following username:
+              </p>
+              <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                <span id="robuxUsernameDisplay" class="font-mono">...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- Buy Pets Section -->
+      <section id="buyPetsSection" class="section hidden">
+        <div class="max-w-4xl w-full mx-auto">
+          <h2 class="text-3xl font-bold mb-8 text-center fade-in">
+            Buy Roblox Pets
+          </h2>
+          <div class="grid grid-cols-1 gap-8 fade-in">
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800"
+            >
+              <h3 class="text-xl font-semibold mb-4">Select Pet to Purchase</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label class="block text-gray-300 mb-2">Pet Type</label>
+                  <div class="custom-select">
+                    <div class="custom-select-selected">
+                      <span>Huge Egg</span>
+                      <div class="w-5 h-5 flex items-center justify-center">
+                        <i class="ri-arrow-down-s-line"></i>
+                      </div>
+                    </div>
+                    <div class="custom-select-options">
+                      <div data-value="Huge Egg" data-price="2.00">
+                        Huge Egg ($2.00 LTC)
+                      </div>
+                      <div data-value="Huge Sphinx" data-price="0.65">
+                        Huge Sphinx ($0.65 LTC)
+                      </div>
+                      <div data-value="God Potion" data-price="0.10">
+                        God Potion ($0.10 LTC)
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-gray-300 mb-2">Quantity</label>
+                  <input
+                    type="number"
+                    id="petQuantity"
+                    class="w-full bg-gray-900 border-none rounded-lg px-4 py-3 text-white"
+                    placeholder="1"
+                    min="1"
+                    value="1"
+                  />
+                </div>
+              </div>
+              <div class="bg-gray-900 p-4 rounded-lg mb-6">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-300">Price per unit:</span>
+                  <span class="font-semibold"
+                    >$<span id="petUnitPrice">2.00</span> LTC</span
+                  >
+                </div>
+                <div class="flex justify-between items-center mt-2">
+                  <span class="text-gray-300">Total price:</span>
+                  <span class="font-semibold"
+                    >$<span id="petTotalPrice">2.00</span> LTC</span
+                  >
+                </div>
+              </div>
+            </div>
+            <div
+              class="bg-black bg-opacity-50 backdrop-blur-sm p-8 rounded-xl border border-gray-800 fade-in"
+            >
+              <h3 class="text-xl font-semibold mb-4">Payment Information</h3>
+              <div class="mb-6">
+                <label class="block text-gray-300 mb-2"
+                  >Your Roblox Username</label
+                >
+                <input
+                  type="text"
+                  id="buyerUsername"
+                  class="w-full bg-gray-900 border-none rounded-lg px-4 py-3 text-white"
+                  placeholder="Your Roblox username"
+                />
+              </div>
+              <div class="mb-6">
+                <label class="block text-gray-300 mb-2"
+                  >Send LTC to this address</label
+                >
+                <div class="relative">
+                  <div class="copy-field">
+                    LeojFgdrydNCJVTU4ULH9ZguhzBRpzYcpY
+                  </div>
+                  <button
+                    class="copy-btn"
+                    data-copy="LeojFgdrydNCJVTU4ULH9ZguhzBRpzYcpY"
+                  >
+                    <div class="w-5 h-5 flex items-center justify-center">
+                      <i class="ri-clipboard-line"></i>
+                    </div>
+                  </button>
+                </div>
+              </div>
+              <button
+                id="checkPaymentBtn"
+                class="btn !rounded-button bg-gradient-to-r from-primary to-primary/80 text-white px-8 py-4 font-medium w-full whitespace-nowrap"
+              >
+                Check
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script>
+      // Background animation
+      const dotBackground = document.getElementById("dotBackground");
+      document.addEventListener("mousemove", (e) => {
+        const x = (e.clientX / window.innerWidth) * 20;
+        const y = (e.clientY / window.innerHeight) * 20;
+        dotBackground.style.backgroundPosition = `${x}px ${y}px`;
+      });
+      // Fade in animations
+      document.addEventListener("DOMContentLoaded", () => {
+        const fadeElements = document.querySelectorAll(".fade-in");
+        fadeElements.forEach((element, index) => {
+          setTimeout(() => {
+            element.classList.add("active");
+          }, 100 * index);
+        });
+      });
+      // Smooth scrolling
+      function scrollToElement(element) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+      // Show section with fade-in animation
+      function showSection(sectionId) {
+        // Hide all sections
+        document.querySelectorAll("section").forEach((section) => {
+          section.classList.add("hidden");
+        });
+        // Show the target section
+        const targetSection = document.getElementById(sectionId);
+        targetSection.classList.remove("hidden");
+        // Trigger fade-in animations
+        const fadeElements = targetSection.querySelectorAll(".fade-in");
+        fadeElements.forEach((element, index) => {
+          element.classList.remove("active");
+          setTimeout(() => {
+            element.classList.add("active");
+          }, 100 * index);
+        });
+        // Scroll to the section
+        scrollToElement(targetSection);
+      }
+      // Copy functionality
+      document.addEventListener("DOMContentLoaded", () => {
+        let toast = document.createElement("div");
+        toast.className = "toast";
+        toast.textContent = "Copied to clipboard!";
+        document.body.appendChild(toast);
+        document.querySelectorAll(".copy-btn").forEach((button) => {
+          button.addEventListener("click", () => {
+            const textToCopy = button.getAttribute("data-copy");
+            navigator.clipboard.writeText(textToCopy).then(() => {
+              const originalText = button.innerHTML;
+              button.innerHTML =
+                '<div class="w-5 h-5 flex items-center justify-center"><i class="ri-check-line"></i></div>';
+              toast.classList.add("show");
+              setTimeout(() => {
+                toast.classList.remove("show");
+              }, 2000);
+              setTimeout(() => {
+                button.innerHTML = originalText;
+              }, 2000);
+            });
+          });
+        });
+      });
+      // Custom select functionality
+      document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".custom-select-selected").forEach((selected) => {
+          selected.addEventListener("click", () => {
+            const select = selected.parentElement;
+            select.classList.toggle("active");
+          });
+        });
+        document.querySelectorAll(".custom-select-options div").forEach((option) => {
+          option.addEventListener("click", () => {
+            const select = option.parentElement.parentElement;
+            const selected = select.querySelector(".custom-select-selected span");
+            selected.textContent = option.textContent.split(" ")[0];
+            select.classList.remove("active");
+            // Handle crypto selection
+            if (option.hasAttribute("data-rate")) {
+              const rate = option.getAttribute("data-rate");
+              document.getElementById("conversionRate").textContent = rate;
+              document.getElementById("selectedCrypto").textContent =
+                option.getAttribute("data-value");
+              updateCryptoEstimate();
+            }
+            // Handle pet selection
+            if (option.hasAttribute("data-price")) {
+              const price = option.getAttribute("data-price");
+              document.getElementById("petUnitPrice").textContent = price;
+              updatePetTotal();
+            }
+          });
+        });
+        // Close custom selects when clicking outside
+        document.addEventListener("click", (e) => {
+          if (!e.target.closest(".custom-select")) {
+            document.querySelectorAll(".custom-select").forEach((select) => {
+              select.classList.remove("active");
+            });
+          }
+        });
+      });
+      // Payment method selection
+      document.addEventListener("DOMContentLoaded", () => {
+        const paymentButtons = document.querySelectorAll(
+          "#cryptoBtn, #paypalBtn, #robuxBtn",
+        );
+        paymentButtons.forEach((button) => {
+          button.addEventListener("mousemove", (e) => {
+            const rect = button.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * 25;
+            const rotateY = ((x - centerX) / centerX) * 25;
+            const scale = 1.15;
+            const brightness = 1.3;
+            button.style.transform = `perspective(800px) rotateX(${-rotateX}deg) rotateY(${rotateY}deg) scale3d(${scale}, ${scale}, ${scale})`;
+            button.style.filter = `brightness(${brightness})`;
+            button.style.boxShadow = `
+      ${rotateY * -1.5}px ${rotateX * -1.5}px 30px rgba(0, 0, 0, 0.3),
+      0 15px 30px -10px rgba(0, 0, 0, 0.4)
+      `;
+            button.style.transition =
+              "transform 0.1s ease-out, filter 0.1s ease-out, box-shadow 0.1s ease-out";
+          });
+          button.addEventListener("mouseleave", () => {
+            button.style.transform =
+              "perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
+            button.style.filter = "brightness(1)";
+            button.style.boxShadow = "0 10px 20px -10px rgba(0, 0, 0, 0.2)";
+            button.style.transition = "all 0.3s ease";
+          });
+        });
+        document.getElementById("cryptoBtn").addEventListener("click", () => {
+          showSection("cryptoSection");
+        });
+        document.getElementById("paypalBtn").addEventListener("click", () => {
+          showSection("paypalSection");
+        });
+        document.getElementById("robuxBtn").addEventListener("click", () => {
+          showSection("robuxSection");
+        });
+        document.getElementById("buyPetsBtn").addEventListener("click", () => {
+          showSection("buyPetsSection");
+        });
+        document.getElementById("returnMainBtn").addEventListener("click", () => {
+          showSection("mainSection");
+        });
+      });
+      // Proceed buttons
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("cryptoProceedBtn").addEventListener("click", () => {
+          const address = document.getElementById("cryptoAddress").value;
+          const amount = document.getElementById("estimatedValue").textContent;
+          const crypto = document.getElementById("selectedCrypto").textContent;
+          if (address.trim() === "") {
+            alert("Please enter your crypto address");
+            return;
+          }
+          document.getElementById("cryptoAddressDisplay").textContent = address;
+          document.getElementById("cryptoAmount").textContent = amount;
+          document.getElementById("cryptoType").textContent = crypto;
+          document.getElementById("cryptoPaymentInfo").classList.remove("hidden");
+          document.getElementById("paypalPaymentInfo").classList.add("hidden");
+          document.getElementById("robuxPaymentInfo").classList.add("hidden");
+          showSection("waitingSection");
+        });
+        document.getElementById("paypalProceedBtn").addEventListener("click", () => {
+          const email = document.getElementById("paypalEmail").value;
+          const amount = document.getElementById("paypalEstimatedValue").textContent;
+          if (email.trim() === "") {
+            alert("Please enter your PayPal email");
+            return;
+          }
+          document.getElementById("paypalEmailDisplay").textContent = email;
+          document.getElementById("paypalAmount").textContent = amount;
+          document.getElementById("cryptoPaymentInfo").classList.add("hidden");
+          document.getElementById("paypalPaymentInfo").classList.remove("hidden");
+          document.getElementById("robuxPaymentInfo").classList.add("hidden");
+          showSection("waitingSection");
+        });
+        document.getElementById("robuxProceedBtn").addEventListener("click", () => {
+          const username = document.getElementById("robuxUsername").value;
+          const amount = document.getElementById("robuxEstimatedValue").textContent;
+          if (username.trim() === "") {
+            alert("Please enter your Roblox username");
+            return;
+          }
+          document.getElementById("robuxUsernameDisplay").textContent = username;
+          document.getElementById("robuxAmount").textContent = amount;
+          document.getElementById("cryptoPaymentInfo").classList.add("hidden");
+          document.getElementById("paypalPaymentInfo").classList.add("hidden");
+          document.getElementById("robuxPaymentInfo").classList.remove("hidden");
+          showSection("waitingSection");
+        });
+      });
+      // Check button functionality
+      document.addEventListener("DOMContentLoaded", () => {
+        const checkBtn = document.getElementById("checkPetsBtn");
+        const noPetsMsg = document.getElementById("noPetsMessage");
+        checkBtn.addEventListener("click", () => {
+          // Disable button and start countdown
+          checkBtn.disabled = true;
+          let countdown = 15;
+          checkBtn.textContent = `Check (${countdown}s)`;
+          const timer = setInterval(() => {
+            countdown--;
+            checkBtn.textContent = `Check (${countdown}s)`;
+            if (countdown <= 0) {
+              clearInterval(timer);
+              checkBtn.disabled = false;
+              checkBtn.textContent = "Check";
+            }
+          }, 1000);
+          // Show "No Pets" message after 2-5 seconds
+          setTimeout(
+            () => {
+              noPetsMsg.classList.remove("hidden");
+              setTimeout(() => {
+                showSection("paymentInfoSection");
+              }, 3000);
+            },
+            2000 + Math.random() * 3000,
+          );
+        });
+      });
+      // Calculator functionality
+      document.addEventListener("DOMContentLoaded", () => {
+        // Crypto calculator
+        const gemsInput = document.getElementById("gemsInput");
+        gemsInput.addEventListener("input", updateCryptoEstimate);
+        // PayPal calculator
+        const paypalGemsInput = document.getElementById("paypalGemsInput");
+        paypalGemsInput.addEventListener("input", () => {
+          const gems = parseFloat(paypalGemsInput.value) || 0;
+          const value = ((gems / 1000000) * 0.49).toFixed(2);
+          document.getElementById("paypalEstimatedValue").textContent = value;
+        });
+        // Robux calculator
+        const robuxGemsInput = document.getElementById("robuxGemsInput");
+        robuxGemsInput.addEventListener("input", () => {
+          const gems = parseFloat(robuxGemsInput.value) || 0;
+          const value = Math.round((gems / 1000000) * 230);
+          document.getElementById("robuxEstimatedValue").textContent = value;
+        });
+        // Pet quantity calculator
+        const petQuantity = document.getElementById("petQuantity");
+        petQuantity.addEventListener("input", updatePetTotal);
+      });
+      function updateCryptoEstimate() {
+        const gems = parseFloat(document.getElementById("gemsInput").value) || 0;
+        const rate = parseFloat(
+          document.getElementById("conversionRate").textContent,
+        );
+        const value = ((gems / 1000000) * rate).toFixed(2);
+        document.getElementById("estimatedValue").textContent = value;
+      }
+      function updatePetTotal() {
+        const quantity = parseInt(document.getElementById("petQuantity").value) || 1;
+        const unitPrice = parseFloat(
+          document.getElementById("petUnitPrice").textContent,
+        );
+        const total = (quantity * unitPrice).toFixed(2);
+        document.getElementById("petTotalPrice").textContent = total;
+      }
+      // Buy pets check button
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("checkPaymentBtn").addEventListener("click", () => {
+          const username = document.getElementById("buyerUsername").value;
+          if (username.trim() === "") {
+            alert("Please enter your Roblox username");
+            return;
+          }
+          // Show loading animation
+          const btn = document.getElementById("checkPaymentBtn");
+          const originalText = btn.textContent;
+          btn.disabled = true;
+          btn.innerHTML =
+            '<div class="w-5 h-5 flex items-center justify-center animate-spin"><i class="ri-loader-2-line"></i></div> Checking...';
+          // Simulate checking
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML =
+              '<div class="w-5 h-5 flex items-center justify-center"><i class="ri-close-line"></i></div> Payment not found';
+            btn.classList.add("bg-red-500");
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.classList.remove("bg-red-500");
+            }, 3000);
+          }, 3000);
+        });
+      });
+    </script>
+  </body>
 </html>
